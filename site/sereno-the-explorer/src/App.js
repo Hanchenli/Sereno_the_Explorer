@@ -1,57 +1,97 @@
-import { Carousel, Card, Divider, Button, Row, Col } from "antd";
-import { LeftOutlined, RightOutlined } from "@ant-design/icons"
-import './App.css';
-import { useRef, useState } from "react";
+import { Carousel, Divider, Button, Row, Col } from "antd";
+import { LeftOutlined, RightOutlined } from "@ant-design/icons";
+import "./App.css";
+import { useEffect, useRef, useState } from "react";
+import { rogers } from "./Prompts";
+import OpenAI from "openai";
 
-const currentScenario = "You've just landed on a planet unknown to most space travelers. The atmosphere is thick with xeno gas, making the air shimmer with an eerie glow. The low gravity makes every step feel like a slow-motion leap, and as you look around, you see the dense vegetation moving – not from the wind, but from the countless reptiles, including crocodiles, that call this planet home. You start with 10 hit points. What is your first move on this alien world?"
-const choices = ["card content 1", "card content 2", "card content 3"]
-const colors = ["#394648", "#FEFFFE", "#E9EBF8", "#B4B8C5", "#A5A299"]
+const colors = ["#394648", "#FEFFFE", "#E9EBF8", "#B4B8C5", "#A5A299"];
 
+const openai = new OpenAI({
+  apiKey: "",
+  dangerouslyAllowBrowser: true,
+});
 
-function ShowScreen(viewingStory, setViewingStory, setChoice, slider) {
-  if(viewingStory) {
+const history = [{ role: "user", content: rogers }];
+
+function ShowScreen(
+  viewingStory,
+  setViewingStory,
+  slider,
+  choices,
+  scenario,
+  setReloads,
+) {
+  if (viewingStory) {
     return (
       <>
-        <div style={{height: "80%", width: "100%"}}>
-
-        </div>
+        <div style={{ height: "80%", width: "100%" }}></div>
         <div onClick={() => setViewingStory(false)}>
           <Divider></Divider>
-          <p>{currentScenario + " Click to continue..."}</p>
+          <Row style={{ width: "100%", height: "100" }} align="middle">
+            <Col span={1} />
+            <Col span={22}>
+              <p>{scenario + " Click to continue..."}</p>
+            </Col>
+          </Row>
         </div>
       </>
     );
   } else {
     return (
       <>
-        <div style={{height: "80%", width: "100%"}}>
-
-        </div>
+        <div style={{ height: "80%", width: "100%" }}></div>
         <div>
-          <Divider/>
-          <Row style={{width:"100%", height:"100"}} align="middle">
+          <Divider />
+          <Row style={{ width: "100%", height: "100" }} align="middle">
             <Col align="middle" justify="center" span={1}>
-            <Button ghost shape="circle" onClick={() => {
-              if(slider.current !== null) slider.current.prev();
-            }}><LeftOutlined /></Button>
+              <Button
+                ghost
+                shape="circle"
+                onClick={() => {
+                  if (slider.current !== null) slider.current.prev();
+                }}
+              >
+                <LeftOutlined />
+              </Button>
             </Col>
             <Col span={22}>
-            <Carousel dots={false} ref={ref => {
-              console.log(ref);
-              slider.current = ref;
-            }}>
-              {choices.map(choice => 
-                <p onClick={() => {
-                  setViewingStory(true);
-                  setChoice(choice)
-                }}>{choice}</p>
-              )}
-            </Carousel>
+              <Carousel
+                dots={false}
+                ref={(ref) => {
+                  slider.current = ref;
+                }}
+              >
+                {choices.map((choice) => (
+                  <p
+                    onClick={() => {
+                      setViewingStory(true);
+                      history.push({
+                        role: "user",
+                        content:
+                          "I chose: " +
+                          choice +
+                          " Give me the next round in the same format.",
+                      });
+                      setReloads((x) => x + 1);
+                    }}
+                  >
+                    {choice}
+                  </p>
+                ))}
+              </Carousel>
             </Col>
             <Col align="middle" span={1}>
-            <Button ghost shape="circle" style={{margin: "auto"}} onClick={() => {
-              if(slider.current !== null) slider.current.next();
-            }}><RightOutlined /></Button>
+              <Button
+                ghost
+                shape="circle"
+                style={{ margin: "auto" }}
+                onClick={() => {
+                  if (slider.current !== null) slider.current.next();
+                }}
+              >
+                <RightOutlined />
+              </Button>
             </Col>
           </Row>
         </div>
@@ -62,12 +102,59 @@ function ShowScreen(viewingStory, setViewingStory, setChoice, slider) {
 
 function App() {
   const [viewingStory, setViewingStory] = useState(true);
-  const [choice, setChoice] = useState("");
+  const [choices, setChoices] = useState([]);
+  const [scenario, setScenario] = useState("");
+  const [reloads, setReloads] = useState(0);
   const slider = useRef();
 
+  useEffect(() => {
+    (async () => {
+      const chatCompletion = await openai.chat.completions.create({
+        messages: history,
+        model: "gpt-3.5-turbo",
+      });
+
+      if (chatCompletion !== null) {
+        history.push(chatCompletion.choices[0].message);
+
+        const introStart =
+          chatCompletion.choices[0].message.content.indexOf(":Introduction:");
+        const aStart = chatCompletion.choices[0].message.content.indexOf(":A:");
+        const bStart = chatCompletion.choices[0].message.content.indexOf(":B:");
+        const cStart = chatCompletion.choices[0].message.content.indexOf(":C:");
+        const end = chatCompletion.choices[0].message.content.indexOf(":END:");
+        const scenario = chatCompletion.choices[0].message.content.substring(
+          introStart + ":Introduction:".length,
+          aStart,
+        );
+        const a = chatCompletion.choices[0].message.content
+          .substring(aStart + ":A:".length, bStart)
+          .trim();
+        const b = chatCompletion.choices[0].message.content
+          .substring(bStart + ":B:".length, cStart)
+          .trim();
+        const c = chatCompletion.choices[0].message.content
+          .substring(cStart + ":C:".length, end)
+          .trim();
+
+        setScenario(scenario);
+        setChoices([a, b, c]);
+      }
+    })();
+
+    return () => {};
+  }, [reloads]);
+
   return (
-    <div style={{height: "100vh", width: "100%", backgroundColor: colors[3]}}>
-      {ShowScreen(viewingStory, setViewingStory, setChoice, slider)}
+    <div style={{ height: "100vh", width: "100%", backgroundColor: colors[3] }}>
+      {ShowScreen(
+        viewingStory,
+        setViewingStory,
+        slider,
+        choices,
+        scenario,
+        setReloads,
+      )}
     </div>
   );
 }
