@@ -1,5 +1,9 @@
 import { Carousel, Divider, Button, Row, Col } from "antd";
-import { LeftOutlined, RightOutlined } from "@ant-design/icons";
+import {
+  LeftOutlined,
+  RightOutlined,
+  LoadingOutlined,
+} from "@ant-design/icons";
 import "./App.css";
 import { useEffect, useRef, useState } from "react";
 import { rogers } from "./Prompts";
@@ -21,6 +25,16 @@ const imageCreation = await openai.images.generate({
   size: "1792x1024",
 });
 
+function ShowLoading() {
+  return (
+    <div style={{ width: "100%", height: "100%" }}>
+      <Row justify="center" align="middle">
+        <LoadingOutlined style={{ fontSize: "25px" }} />
+      </Row>
+    </div>
+  );
+}
+
 function ShowScreen(
   viewingStory,
   setViewingStory,
@@ -28,6 +42,7 @@ function ShowScreen(
   choices,
   scenario,
   setReloads,
+  setLoading,
 ) {
   if (viewingStory) {
     return (
@@ -47,7 +62,7 @@ function ShowScreen(
       <>
         <div>
           <Row style={{ width: "100%", height: "100" }} align="middle">
-            <Col align="middle" justify="center" span={1}>
+            <Col align="middle" span={1}>
               <Button
                 ghost
                 shape="circle"
@@ -77,6 +92,7 @@ function ShowScreen(
                           " Give me the next round in the same format.",
                       });
                       setReloads((x) => x + 1);
+                      setLoading(true);
                     }}
                   >
                     {choice}
@@ -108,6 +124,7 @@ function App() {
   const [choices, setChoices] = useState([]);
   const [scenario, setScenario] = useState("");
   const [reloads, setReloads] = useState(0);
+  const [loading, setLoading] = useState(true);
   const slider = useRef();
 
   useEffect(() => {
@@ -142,6 +159,7 @@ function App() {
 
         setScenario(scenario);
         setChoices([a, b, c]);
+        setLoading(false);
       }
     })();
 
@@ -160,14 +178,17 @@ function App() {
       </div>
       <Divider />
 
-      {ShowScreen(
-        viewingStory,
-        setViewingStory,
-        slider,
-        choices,
-        scenario,
-        setReloads,
-      )}
+      {loading
+        ? ShowLoading()
+        : ShowScreen(
+            viewingStory,
+            setViewingStory,
+            slider,
+            choices,
+            scenario,
+            setReloads,
+            setLoading,
+          )}
     </div>
   );
 }
