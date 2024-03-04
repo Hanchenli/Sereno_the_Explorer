@@ -14,6 +14,13 @@ const openai = new OpenAI({
 
 const history = [{ role: "user", content: rogers }];
 
+const imageCreation = await openai.images.generate({
+  model: "dall-e-3",
+  prompt: rogers,
+  n: 1,
+  size: "1792x1024",
+});
+
 function ShowScreen(
   viewingStory,
   setViewingStory,
@@ -25,9 +32,7 @@ function ShowScreen(
   if (viewingStory) {
     return (
       <>
-        <div style={{ height: "80%", width: "100%" }}></div>
         <div onClick={() => setViewingStory(false)}>
-          <Divider></Divider>
           <Row style={{ width: "100%", height: "100" }} align="middle">
             <Col span={1} />
             <Col span={22}>
@@ -40,9 +45,7 @@ function ShowScreen(
   } else {
     return (
       <>
-        <div style={{ height: "80%", width: "100%" }}></div>
         <div>
-          <Divider />
           <Row style={{ width: "100%", height: "100" }} align="middle">
             <Col align="middle" justify="center" span={1}>
               <Button
@@ -147,6 +150,16 @@ function App() {
 
   return (
     <div style={{ height: "100vh", width: "100%", backgroundColor: colors[3] }}>
+      <div style={{ height: "80%", width: "100%" }}>
+        <Row justify="center" style={{ height: "100%", width: "100%" }}>
+          <img
+            src={imageCreation.data[0].url}
+            style={{ objectFit: "cover", height: "100%", marginTop: "10px" }}
+          />
+        </Row>
+      </div>
+      <Divider />
+
       {ShowScreen(
         viewingStory,
         setViewingStory,
