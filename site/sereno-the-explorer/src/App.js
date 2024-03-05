@@ -18,18 +18,11 @@ const openai = new OpenAI({
 
 const history = [{ role: "user", content: rogers }];
 
-const imageCreation = await openai.images.generate({
-  model: "dall-e-3",
-  prompt: rogers,
-  n: 1,
-  size: "1792x1024",
-});
-
 function ShowLoading() {
   return (
     <div style={{ width: "100%", height: "100%" }}>
       <Row justify="center" align="middle">
-        <LoadingOutlined style={{ fontSize: "25px" }} />
+        <LoadingOutlined style={{ fontSize: "25px", color: "#394648" }} />
       </Row>
     </div>
   );
@@ -125,7 +118,21 @@ function App() {
   const [scenario, setScenario] = useState("");
   const [reloads, setReloads] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [imageUrl, setImageUrl] = useState("");
   const slider = useRef();
+
+  useEffect(() => {
+    (async () => {
+      const imageCreation = await openai.images.generate({
+        model: "dall-e-3",
+        prompt: rogers,
+        n: 1,
+        size: "1792x1024",
+      });
+
+      setImageUrl(imageCreation.data[0].url);
+    })();
+  }, [])
 
   useEffect(() => {
     (async () => {
@@ -171,7 +178,7 @@ function App() {
       <div style={{ height: "80%", width: "100%" }}>
         <Row justify="center" style={{ height: "100%", width: "100%" }}>
           <img
-            src={imageCreation.data[0].url}
+            src={imageUrl}
             style={{ objectFit: "cover", height: "100%", marginTop: "10px" }}
           />
         </Row>
