@@ -118,6 +118,6 @@ export default function GameDisplay() {
           setLoading,
         )
       )}
-    </div>
+      </div>
   );
 }
