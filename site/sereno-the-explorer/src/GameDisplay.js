@@ -16,17 +16,21 @@ function ShowScreen(
   slider,
   choices,
   scenario,
+  reloads,
   setReloads,
   setLoading,
 ) {
   if (viewingStory) {
     return (
       <>
-        <div onClick={() => setViewingStory(false)}>
+        <div onClick={() => {
+          if (reloads < 10) setViewingStory(false);
+        }}>
+
           <Row style={{ width: "100%", height: "100" }} align="middle">
             <Col span={1} />
             <Col span={22}>
-              <p>{scenario + " Click to continue..."}</p>
+              <p>{scenario + (reloads < 10 ? " Click to continue..." : "")}</p>
             </Col>
           </Row>
         </div>
@@ -62,10 +66,9 @@ function ShowScreen(
                       history.push({
                         role: "user",
                         content:
-                          "I chose: " +
-                          choice +
-                          " Give me the next round in the same format.",
-                      });
+                          "The user chooses" +
+                          choice + "Give the next round based on the following format, note that the colon around a word is very important: :Introduction: (introduction content), :A: (the first choice), :B: (the second choice), :C: (the third choice), :END: (ending content)"
+                            });
                       setReloads((x) => x + 1);
                       setLoading(true);
                     }}
@@ -95,8 +98,8 @@ function ShowScreen(
 }
 
 export default function GameDisplay() {
-  const imageUrl = useImage(rogers);
-  let { choices, scenario, setReloads, loading, setLoading } = useText(history);
+  const imageUrl = ""//useImage(rogers);
+  let { choices, scenario, reloads, setReloads, loading, setLoading } = useText(history);
   const [viewingStory, setViewingStory] = useState(true);
 
   const slider = useRef();
@@ -114,6 +117,7 @@ export default function GameDisplay() {
           slider,
           choices,
           scenario,
+          reloads,
           setReloads,
           setLoading,
         )

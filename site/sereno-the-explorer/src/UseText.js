@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import useOpenAI from "./UseOpenAI";
 
+
 const useText = (history) => {
   const [choices, setChoices] = useState([]);
   const [scenario, setScenario] = useState("");
@@ -10,6 +11,10 @@ const useText = (history) => {
 
   useEffect(() => {
     (async () => {
+      if (reloads === 10){
+        history.push({role: "user",
+                        content: "Now ten rounds are over, rate my performace with a numerical score and explanation. Start the comment with :Introduction: and end with :A:"}                        )
+      } 
       const chatCompletion = await openai.chat.completions.create({
         messages: history,
         model: "gpt-3.5-turbo",
@@ -17,6 +22,7 @@ const useText = (history) => {
 
       if (chatCompletion !== null) {
         history.push(chatCompletion.choices[0].message);
+        console.log(chatCompletion.choices[0].message);
 
         const introStart =
           chatCompletion.choices[0].message.content.indexOf(":Introduction:");
@@ -26,7 +32,7 @@ const useText = (history) => {
         const end = chatCompletion.choices[0].message.content.indexOf(":END:");
         const scenario = chatCompletion.choices[0].message.content.substring(
           introStart + ":Introduction:".length,
-          aStart,
+          aStart === -1 ? chatCompletion.choices[0].message.length : aStart,
         );
         const a = chatCompletion.choices[0].message.content
           .substring(aStart + ":A:".length, bStart)
