@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import useOpenAI from "./UseOpenAI.js";
 
 const useImage = (imagePrompt) => {
-  console.log(imagePrompt);
   const [imageUrl, setImageUrl] = useState("");
   const openai = useOpenAI();
 

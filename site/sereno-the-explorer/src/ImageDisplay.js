@@ -4,7 +4,7 @@ export default function ImageDisplay(props) {
   let { url } = props;
 
   return (
-    <div style={{ height: "80%", width: "100%" }}>
+    <div style={{ height: "75%", width: "100%" }}>
       <Row justify="center" style={{ height: "100%", width: "100%" }}>
         <img
           src={url}
