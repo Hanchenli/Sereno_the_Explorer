@@ -69,14 +69,18 @@ function About(props) {
           </Row>
           <Row justify="center">
             <Card size="small">
-            <p style={{ color: "#394648" }}>
-                Here is a note to you all as players. Since this game is written harnessing the power of 
-                generative AI, it is possible that something nonsensical can be generated. As we discussed
-                with Professor Zhao, large language models just predict the word that is most likely to follow
-                the string of words that is already written. So, any input that we give a large language model
-                can be distorted over the course of a game. There is no way for us to correct this. If we could,
-                we'd probably have quite the research paper on our hands. If you run into a nonsensical situation like
-                this, please just refresh your page and try again.
+              <p style={{ color: "#394648" }}>
+                Here is a note to you all as players. Since this game is written
+                harnessing the power of generative AI, it is possible that
+                something nonsensical can be generated. As we discussed with
+                Professor Zhao, large language models just predict the word that
+                is most likely to follow the string of words that is already
+                written. So, any input that we give a large language model can
+                be distorted over the course of a game. There is no way for us
+                to correct this. If we could, we'd probably have quite the
+                research paper on our hands. If you run into a nonsensical
+                situation like this, please just refresh your page and try
+                again.
               </p>
             </Card>
           </Row>

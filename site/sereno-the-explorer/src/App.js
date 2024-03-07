@@ -10,8 +10,7 @@ import { Row } from "antd";
 import About from "./About.js";
 
 const prompts = [rogers, sereno, london];
-export const prompt = sereno;//prompts[Math.floor(Math.random() * prompts.length)];
-
+export const prompt = prompts[Math.floor(Math.random() * prompts.length)];
 
 function App() {
   const imageUrl = useImage(prompt);

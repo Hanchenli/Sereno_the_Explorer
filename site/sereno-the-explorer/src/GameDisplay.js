@@ -109,11 +109,12 @@ function ShowScreen(
 export default function GameDisplay(props) {
   let { imageUrl, prompt } = props;
   useEffect(() => {
-    history.push({role: "user", content: prompt});
+    history.push({ role: "user", content: prompt });
   }, [prompt]);
 
   const [viewingStory, setViewingStory] = useState(true);
-  let { choices, scenario, reloads, setReloads, loading, setLoading } = useText(history);
+  let { choices, scenario, reloads, setReloads, loading, setLoading } =
+    useText(history);
 
   const slider = useRef();
 
